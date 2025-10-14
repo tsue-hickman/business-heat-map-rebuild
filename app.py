@@ -1,9 +1,10 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from app.extensions import db
 import os
 
-# Initialize extensions
-db = SQLAlchemy()
+# Initialize login manager
+login_manager = LoginManager()
 
 def create_app(config_name='development'):
     app = Flask(__name__, 
@@ -14,11 +15,22 @@ def create_app(config_name='development'):
     app.config.from_object(config[config_name])
     
     db.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'info'
     
-    # Import models to register them with SQLAlchemy
+    # User loader for Flask-Login
+    from app.models import User
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+    
+    # Import models and create tables
     with app.app_context():
         from app.models import User, Location, Demographic
-        db.create_all()  # Create tables if they don't exist
+        db.create_all()
     
     # Import and register blueprints
     from app.routes import main, auth, admin

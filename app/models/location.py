@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 from datetime import datetime
 
 class Location(db.Model):
@@ -17,7 +17,6 @@ class Location(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     
-    # Relationship to user
     creator = db.relationship('User', backref='locations')
     
     def __repr__(self):

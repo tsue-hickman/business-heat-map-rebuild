@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 from datetime import datetime
 
 class Demographic(db.Model):
@@ -19,7 +19,6 @@ class Demographic(db.Model):
         return f'<Demographic {self.zip_code} - {self.city}, {self.state}>'
     
     def get_income_range(self):
-        """Return income bracket category"""
         if not self.median_income:
             return 'Unknown'
         if self.median_income < 40000:

@@ -2,31 +2,33 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import create_app, db
+from app.extensions import db
 from app.models import User, Location, Demographic
 
 def load_sample_data():
-    """Load sample data into the database"""
-    app = create_app('development')
+    # Import create_app from the root app.py
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("app", "app.py")
+    app_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(app_module)
+    
+    app = app_module.create_app('development')
     
     with app.app_context():
         print("Loading sample data...")
         
-        # Check if data already exists
         if User.query.count() > 0:
             print("⚠️  Database already has data. Skipping...")
             return
         
-        # Create sample admin user
         admin = User(
             username='admin',
             email='admin@businessheatmap.com',
             role='admin'
         )
-        admin.set_password('admin123')  # Change this in production!
+        admin.set_password('admin123')
         db.session.add(admin)
         
-        # Create sample regular user
         user = User(
             username='demo_user',
             email='demo@businessheatmap.com',
@@ -36,9 +38,8 @@ def load_sample_data():
         db.session.add(user)
         
         db.session.commit()
-        print("✅ Created 2 sample users (admin & demo_user)")
+        print("✅ Created 2 sample users")
         
-        # Create sample locations
         locations = [
             Location(
                 name='Downtown Coffee Shop',
@@ -82,7 +83,6 @@ def load_sample_data():
         db.session.commit()
         print(f"✅ Created {len(locations)} sample locations")
         
-        # Create sample demographic data
         demographics = [
             Demographic(
                 zip_code='64101',

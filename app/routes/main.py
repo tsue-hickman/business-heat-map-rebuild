@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from app.models import User, Location, Demographic
-from app import db
+from app.extensions import db
 
 bp = Blueprint('main', __name__)
 
@@ -17,7 +17,6 @@ def hello():
 
 @bp.route('/api/stats')
 def stats():
-    """Get database statistics"""
     try:
         user_count = User.query.count()
         location_count = Location.query.count()
@@ -40,7 +39,6 @@ def stats():
 
 @bp.route('/api/locations')
 def get_locations():
-    """Get all business locations"""
     try:
         locations = Location.query.all()
         return jsonify({
@@ -64,7 +62,6 @@ def get_locations():
 
 @bp.route('/api/demographics')
 def get_demographics():
-    """Get all demographic data"""
     try:
         demographics = Demographic.query.all()
         return jsonify({
