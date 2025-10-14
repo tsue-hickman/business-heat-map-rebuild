@@ -18,30 +18,72 @@
       </div>
 
       <div class="info-box">
-        <h2>Project Status - Week 1 Complete</h2>
+        <h2>Project Status - Week 4 Complete</h2>
         <ul>
           <li>✅ Virtual environment configured</li>
           <li>✅ Flask installed and running</li>
           <li>✅ Proper project structure created</li>
           <li>✅ Configuration management set up</li>
-          <li>✅ Ready for database integration</li>
+          <li>✅ Database models created (User, Location, Demographic)</li>
+          <li>✅ Sample data loaded</li>
+          <li>✅ API endpoints working</li>
         </ul>
       </div>
 
+      <div class="info-box" id="db-stats">
+        <h2>Database Statistics</h2>
+        <p>Loading...</p>
+      </div>
+
       <div class="info-box">
-        <h2>Coming Next - Week 2-4</h2>
+        <h2>Coming Next - Week 5-6</h2>
         <ul>
-          <li>PostgreSQL database setup</li>
-          <li>User, Location, and Demographic models</li>
-          <li>Database migrations with Alembic</li>
-          <li>Sample data generation</li>
+          <li>User authentication system (login/logout)</li>
+          <li>Session management</li>
+          <li>Admin role protection</li>
+          <li>User dashboard</li>
         </ul>
       </div>
 
       <div class="test-links">
         <h3>Test Endpoints:</h3>
         <a href="/hello" class="btn">JSON API Test</a>
+        <a href="/api/stats" class="btn">Database Stats</a>
+        <a href="/api/locations" class="btn">View Locations</a>
+        <a href="/api/demographics" class="btn">View Demographics</a>
       </div>
     </div>
+
+    <script>
+      // Fetch database stats on page load
+      fetch("/api/stats")
+        .then((response) => response.json())
+        .then((data) => {
+          const statsDiv = document.getElementById("db-stats");
+          if (data.status === "success") {
+            statsDiv.innerHTML = `
+                        <h2>Database Statistics 📊</h2>
+                        <ul>
+                            <li><strong>Users:</strong> ${data.stats.users}</li>
+                            <li><strong>Business Locations:</strong> ${data.stats.locations}</li>
+                            <li><strong>Demographic Records:</strong> ${data.stats.demographics}</li>
+                        </ul>
+                        <p style="color: #28a745; font-weight: bold;">✅ Database Connected</p>
+                    `;
+          } else {
+            statsDiv.innerHTML = `
+                        <h2>Database Statistics</h2>
+                        <p style="color: #dc3545;">❌ Database Error: ${data.message}</p>
+                    `;
+          }
+        })
+        .catch((error) => {
+          const statsDiv = document.getElementById("db-stats");
+          statsDiv.innerHTML = `
+                    <h2>Database Statistics</h2>
+                    <p style="color: #dc3545;">❌ Could not connect to database</p>
+                `;
+        });
+    </script>
   </body>
 </html>
