@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Business Heat Map</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Business Heat Map Application</h1>
+
+      <div class="status-box success">
+        ✅ Flask Application Running Successfully
+      </div>
+
+      <div class="info-box">
+        <h2>Project Status - Week 1 Complete</h2>
+        <ul>
+          <li>✅ Virtual environment configured</li>
+          <li>✅ Flask installed and running</li>
+          <li>✅ Proper project structure created</li>
+          <li>✅ Configuration management set up</li>
+          <li>✅ Ready for database integration</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Coming Next - Week 2-4</h2>
+        <ul>
+          <li>PostgreSQL database setup</li>
+          <li>User, Location, and Demographic models</li>
+          <li>Database migrations with Alembic</li>
+          <li>Sample data generation</li>
+        </ul>
+      </div>
+
+      <div class="test-links">
+        <h3>Test Endpoints:</h3>
+        <a href="/hello" class="btn">JSON API Test</a>
+      </div>
+    </div>
+  </body>
+</html>
