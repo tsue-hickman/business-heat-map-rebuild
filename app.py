@@ -6,7 +6,6 @@ import os
 db = SQLAlchemy()
 
 def create_app(config_name='development'):
-    # Tell Flask where to find templates - inside the app folder
     app = Flask(__name__, 
                 template_folder='app/templates',
                 static_folder='app/static')
@@ -15,6 +14,11 @@ def create_app(config_name='development'):
     app.config.from_object(config[config_name])
     
     db.init_app(app)
+    
+    # Import models to register them with SQLAlchemy
+    with app.app_context():
+        from app.models import User, Location, Demographic
+        db.create_all()  # Create tables if they don't exist
     
     # Import and register blueprints
     from app.routes import main, auth, admin
