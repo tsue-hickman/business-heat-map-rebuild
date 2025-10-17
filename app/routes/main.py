@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify
+from flask_login import login_required, current_user
 from app.models import User, Location, Demographic
 from app.extensions import db
 
@@ -7,6 +8,24 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def home():
     return render_template('index.html')
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    """User dashboard - requires login"""
+    # Get user's locations
+    user_locations = Location.query.filter_by(created_by=current_user.id).all()
+    
+    # Get total counts
+    total_users = User.query.count()
+    total_locations = Location.query.count()
+    total_demographics = Demographic.query.count()
+    
+    return render_template('dashboard.html',
+                         user_locations=user_locations,
+                         total_users=total_users,
+                         total_locations=total_locations,
+                         total_demographics=total_demographics)
 
 @bp.route('/hello')
 def hello():
