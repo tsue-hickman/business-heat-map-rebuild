@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Users - Admin Panel</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="dashboard-header">
+        <h1>👥 Manage Users</h1>
+        <div class="user-info">
+          <a href="{{ url_for('admin.panel') }}" class="btn btn-sm"
+            >← Back to Admin</a
+          >
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-sm">Logout</a>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="section-header">
+          <h2>All Users ({{ users|length }})</h2>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Locations</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.id }}</td>
+              <td>
+                <strong>{{ user.username }}</strong>
+                {% if user.id == current_user.id %}
+                <span class="badge badge-info">You</span>
+                {% endif %}
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="badge badge-{{ user.role }}">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>{{ user.locations|length }}</td>
+              <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

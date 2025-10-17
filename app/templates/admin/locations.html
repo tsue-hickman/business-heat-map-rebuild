@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Locations - Admin Panel</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="dashboard-header">
+        <h1>📍 Manage Locations</h1>
+        <div class="user-info">
+          <a href="{{ url_for('admin.panel') }}" class="btn btn-sm"
+            >← Back to Admin</a
+          >
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-sm">Logout</a>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="section-header">
+          <h2>All Business Locations ({{ locations|length }})</h2>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>State</th>
+              <th>ZIP</th>
+              <th>Type</th>
+              <th>Created By</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for location in locations %}
+            <tr>
+              <td>{{ location.id }}</td>
+              <td><strong>{{ location.name }}</strong></td>
+              <td>{{ location.address }}</td>
+              <td>{{ location.city }}</td>
+              <td>{{ location.state }}</td>
+              <td>{{ location.zip_code }}</td>
+              <td>{{ location.business_type or 'N/A' }}</td>
+              <td>
+                {{ location.creator.username if location.creator else 'N/A' }}
+              </td>
+              <td>{{ location.created_at.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
