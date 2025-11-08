@@ -13,10 +13,8 @@ def home():
 @login_required
 def dashboard():
     """User dashboard - requires login"""
-    # Get user's locations
     user_locations = Location.query.filter_by(created_by=current_user.id).all()
     
-    # Get total counts
     total_users = User.query.count()
     total_locations = Location.query.count()
     total_demographics = Demographic.query.count()
@@ -101,3 +99,8 @@ def get_demographics():
             'status': 'error',
             'message': str(e)
         }), 500
+
+@bp.route('/map')
+def map_view():
+    """Interactive heat map page"""
+    return render_template('map.html')

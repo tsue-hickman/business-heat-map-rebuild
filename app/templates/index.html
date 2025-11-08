@@ -1,6 +1,21 @@
+<div class="test-links">
+    <h3>Explore the Application:</h3>
+    <a href="{{ url_for('main.map_view') }}" class="btn btn-primary" style="font-size: 1.2em; padding: 15px 30px;">
+        View Interactive Heat Map
+    </a>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" class="btn">Go to Dashboard</a>
+        {% if current_user.is_admin() %}
+            <a href="{{ url_for('admin.panel') }}" class="btn">Admin Panel</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn">Login to Continue</a>
+    {% endif %}
+</div>
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+  <head;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Business Heat Map</title>
@@ -11,22 +26,48 @@
   </head>
   <body>
     <div class="container">
-      <h1>Business Heat Map Application</h1>
+      <div class="dashboard-header">
+        <h1>Business Heat Map Application</h1>
+        <div class="user-info">
+          {% if current_user.is_authenticated %}
+          <span
+            class="badge badge-{{ 'admin' if current_user.is_admin() else 'user' }}"
+          >
+            {{ current_user.username }}
+          </span>
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm"
+            >Dashboard</a
+          >
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-sm">Logout</a>
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-sm">Login</a>
+          <a
+            href="{{ url_for('auth.register') }}"
+            class="btn btn-primary btn-sm"
+            >Register</a
+          >
+          {% endif %}
+        </div>
+      </div>
 
       <div class="status-box success">
-        ✅ Flask Application Running Successfully
+        Flask Application Running Successfully
       </div>
 
       <div class="info-box">
-        <h2>Project Status - Week 4 Complete</h2>
+        <h2>Project Status - Week 6 Complete!</h2>
         <ul>
-          <li>✅ Virtual environment configured</li>
-          <li>✅ Flask installed and running</li>
-          <li>✅ Proper project structure created</li>
-          <li>✅ Configuration management set up</li>
-          <li>✅ Database models created (User, Location, Demographic)</li>
-          <li>✅ Sample data loaded</li>
-          <li>✅ API endpoints working</li>
+          <li>Virtual environment configured</li>
+          <li>Flask installed and running</li>
+          <li>Proper project structure created</li>
+          <li>Configuration management set up</li>
+          <li>Database models created (User, Location, Demographic)</li>
+          <li>Sample data loaded</li>
+          <li>API endpoints working</li>
+          <li>User authentication system complete</li>
+          <li>Login/logout functionality</li>
+          <li>User dashboard</li>
+          <li>Admin panel with role protection</li>
         </ul>
       </div>
 
@@ -36,44 +77,57 @@
       </div>
 
       <div class="info-box">
-        <h2>Coming Next - Week 5-6</h2>
+        <h2>Coming Next - Week 7-8: Interactive Heat Map!</h2>
         <ul>
-          <li>User authentication system (login/logout)</li>
-          <li>Session management</li>
-          <li>Admin role protection</li>
-          <li>User dashboard</li>
+          <li>Leaflet.js interactive mapping</li>
+          <li>ZIP code boundary visualization</li>
+          <li>Color-coded heat map by demographics</li>
+          <li>Business location markers</li>
+          <li>Filter controls (income, population, etc.)</li>
+          <li>Click interactions and popups</li>
         </ul>
       </div>
 
       <div class="test-links">
-        <h3>Test Endpoints:</h3>
-        <a href="/hello" class="btn">JSON API Test</a>
-        <a href="/api/stats" class="btn">Database Stats</a>
-        <a href="/api/locations" class="btn">View Locations</a>
-        <a href="/api/demographics" class="btn">View Demographics</a>
+        <h3>Test the Application:</h3>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary"
+          >Go to Dashboard</a
+        >
+        {% if current_user.is_admin() %}
+        <a href="{{ url_for('admin.panel') }}" class="btn btn-primary"
+          >Admin Panel</a
+        >
+        {% endif %} {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary"
+          >Login to Continue</a
+        >
+        {% endif %}
+        <a href="/api/stats" class="btn">Database Stats API</a>
+        <a href="/api/locations" class="btn">View Locations API</a>
+        <a href="/api/demographics" class="btn">View Demographics API</a>
       </div>
     </div>
 
     <script>
-      // Fetch database stats on page load
       fetch("/api/stats")
         .then((response) => response.json())
         .then((data) => {
           const statsDiv = document.getElementById("db-stats");
           if (data.status === "success") {
             statsDiv.innerHTML = `
-                        <h2>Database Statistics 📊</h2>
+                        <h2>Database Statistics</h2>
                         <ul>
                             <li><strong>Users:</strong> ${data.stats.users}</li>
                             <li><strong>Business Locations:</strong> ${data.stats.locations}</li>
                             <li><strong>Demographic Records:</strong> ${data.stats.demographics}</li>
                         </ul>
-                        <p style="color: #28a745; font-weight: bold;">✅ Database Connected</p>
+                        <p style="color: #28a745; font-weight: bold;">Database Connected</p>
                     `;
           } else {
             statsDiv.innerHTML = `
                         <h2>Database Statistics</h2>
-                        <p style="color: #dc3545;">❌ Database Error: ${data.message}</p>
+                        <p style="color: #dc3545;">Database Error: ${data.message}</p>
                     `;
           }
         })
@@ -81,7 +135,7 @@
           const statsDiv = document.getElementById("db-stats");
           statsDiv.innerHTML = `
                     <h2>Database Statistics</h2>
-                    <p style="color: #dc3545;">❌ Could not connect to database</p>
+                    <p style="color: #dc3545;">Could not connect to database</p>
                 `;
         });
     </script>
