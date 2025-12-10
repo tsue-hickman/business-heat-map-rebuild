@@ -1,6 +1,28 @@
+# Business Heat Map - Python Dependencies
+# Install all with: pip install -r requirements.txt
+
+# Core Flask framework
 Flask==2.3.3
+
+# Database
 Flask-SQLAlchemy==3.0.5
+
+# User authentication
 Flask-Login==0.6.3
-python-dotenv==1.0.0
-Werkzeug==2.3.7
+
+# Forms and validation
+Flask-WTF==1.2.1
+WTForms==3.1.1
 email-validator==2.1.1
+
+# Password hashing and security
+Werkzeug==2.3.7
+
+# Environment variables
+python-dotenv==1.0.0
+
+# For production deployment (optional)
+gunicorn==21.2.0
+
+# Database driver for PostgreSQL (if you want to use it instead of SQLite)
+# psycopg2-binary==2.9.7

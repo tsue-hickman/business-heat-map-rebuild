@@ -23,32 +23,52 @@
         </div>
       </div>
 
+      <!-- Flash messages (success/error alerts) -->
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %} {% for category, message in messages %}
       <div class="alert alert-{{ category }}">{{ message }}</div>
       {% endfor %} {% endif %} {% endwith %}
 
+      <!-- Statistics Cards -->
       <div class="stats-grid">
         <div class="stat-card">
           <h3>Your Locations</h3>
           <div class="stat-number">{{ user_locations|length }}</div>
+          <small>Businesses you've added</small>
         </div>
         <div class="stat-card">
           <h3>Total Locations</h3>
           <div class="stat-number">{{ total_locations }}</div>
+          <small>Across all users</small>
         </div>
         <div class="stat-card">
           <h3>ZIP Codes</h3>
           <div class="stat-number">{{ total_demographics }}</div>
+          <small>With demographic data</small>
         </div>
         {% if current_user.is_admin() %}
         <div class="stat-card">
           <h3>Total Users</h3>
           <div class="stat-number">{{ total_users }}</div>
+          <small>Registered accounts</small>
         </div>
         {% endif %}
       </div>
 
+      <!-- Quick Actions -->
+      <div class="dashboard-actions" style="margin-bottom: 30px">
+        <a href="{{ url_for('main.add_location') }}" class="btn btn-primary">
+          ➕ Add New Location
+        </a>
+        <a href="{{ url_for('main.map_view') }}" class="btn">
+          🗺️ View Heat Map
+        </a>
+        {% if current_user.is_admin() %}
+        <a href="{{ url_for('admin.panel') }}" class="btn"> ⚙️ Admin Panel </a>
+        {% endif %}
+      </div>
+
+      <!-- Your Locations Table -->
       <div class="info-box">
         <h2>Your Business Locations</h2>
         {% if user_locations %}
@@ -66,7 +86,7 @@
           <tbody>
             {% for location in user_locations %}
             <tr>
-              <td>{{ location.name }}</td>
+              <td><strong>{{ location.name }}</strong></td>
               <td>{{ location.address }}</td>
               <td>{{ location.city }}</td>
               <td>{{ location.state }}</td>
@@ -76,19 +96,39 @@
             {% endfor %}
           </tbody>
         </table>
+        <p style="margin-top: 15px; color: #666">
+          <a
+            href="{{ url_for('main.map_view') }}"
+            style="color: #667eea; text-decoration: none"
+          >
+            → View these locations on the heat map
+          </a>
+        </p>
         {% else %}
         <p>You haven't added any locations yet.</p>
+        <p style="margin-top: 15px">
+          <a href="{{ url_for('main.add_location') }}" class="btn">
+            Add Your First Location
+          </a>
+        </p>
         {% endif %}
       </div>
 
-      <div class="dashboard-actions">
-        <a href="{{ url_for('main.home') }}" class="btn">View Heat Map</a>
-        {% if current_user.is_admin() %}
-        <a href="{{ url_for('admin.panel') }}" class="btn btn-primary"
-          >Admin Panel</a
-        >
-        {% endif %}
+      <!-- Tips for New Users -->
+      {% if user_locations|length == 0 %}
+      <div
+        class="info-box"
+        style="background: #e7f3ff; border-left: 4px solid #2196f3"
+      >
+        <h3 style="margin-top: 0">💡 Getting Started</h3>
+        <ul style="margin-left: 20px">
+          <li>Add business locations you're considering</li>
+          <li>View demographic data for each area on the heat map</li>
+          <li>Compare median income, population density, and home values</li>
+          <li>Use filters to find the best markets for your business</li>
+        </ul>
       </div>
+      {% endif %}
     </div>
   </body>
 </html>

@@ -4,30 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heat Map - Business Location Intelligence</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
 
-    <!-- Leaflet CSS -->
+    <!-- Leaflet CSS for the map -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
 
     <style>
-      body {
+      * {
         margin: 0;
         padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box;
       }
 
-      .map-container {
-        display: flex;
-        height: 100vh;
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         overflow: hidden;
       }
 
+      /* Main layout - sidebar next to map */
+      .map-container {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Left sidebar with controls */
       .sidebar {
         width: 350px;
         background: white;
@@ -38,22 +40,62 @@
       }
 
       .sidebar h1 {
-        margin: 0 0 20px 0;
+        margin: 0 0 15px 0;
         font-size: 1.5em;
         color: #333;
       }
 
+      /* User info bar at top of sidebar */
       .user-info-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         padding-bottom: 15px;
         border-bottom: 2px solid #eee;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
+      .btn-small {
+        padding: 8px 15px;
+        font-size: 0.85em;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-small:hover {
+        background: #5568d3;
+      }
+
+      /* Stats box showing counts */
+      .stats-box {
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .stats-box h4 {
+        margin: 0 0 10px 0;
+      }
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+        font-size: 0.95em;
+      }
+
+      /* Filter sections */
       .filter-section {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         padding: 15px;
         background: #f8f9fa;
         border-radius: 8px;
@@ -92,12 +134,13 @@
         border-color: #667eea;
       }
 
+      /* Legend showing what colors mean */
       .legend {
-        margin-top: 20px;
         padding: 15px;
         background: white;
         border-radius: 8px;
         border: 2px solid #eee;
+        margin-top: 20px;
       }
 
       .legend h4 {
@@ -121,30 +164,13 @@
         border: 1px solid #ddd;
       }
 
-      .stats-box {
-        padding: 15px;
-        background: #e3f2fd;
-        border-radius: 8px;
-        margin-bottom: 20px;
-      }
-
-      .stats-box h4 {
-        margin: 0 0 10px 0;
-        color: #1976d2;
-      }
-
-      .stat-item {
-        display: flex;
-        justify-content: space-between;
-        margin: 5px 0;
-        font-size: 0.9em;
-      }
-
+      /* The map takes up the rest of the space */
       #map {
         flex: 1;
         height: 100vh;
       }
 
+      /* Popup styling when you click on the map */
       .leaflet-popup-content {
         margin: 10px;
         font-size: 0.9em;
@@ -162,22 +188,7 @@
         color: #666;
       }
 
-      .btn-small {
-        padding: 8px 15px;
-        font-size: 0.85em;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-      }
-
-      .btn-small:hover {
-        background: #5568d3;
-      }
-
+      /* Mobile responsive - stack sidebar on top */
       @media (max-width: 768px) {
         .map-container {
           flex-direction: column;
@@ -197,10 +208,11 @@
   </head>
   <body>
     <div class="map-container">
-      <!-- Sidebar with filters and legend -->
+      <!-- LEFT SIDEBAR -->
       <div class="sidebar">
-        <h1>🗺️ Heat Map</h1>
+        <h1>🗺️ Business Heat Map</h1>
 
+        <!-- User info -->
         <div class="user-info-bar">
           {% if current_user.is_authenticated %}
           <span>👤 {{ current_user.username }}</span>
@@ -213,27 +225,28 @@
           {% endif %}
         </div>
 
-        <!-- Stats Box -->
+        <!-- Stats -->
         <div class="stats-box">
           <h4>📊 Map Statistics</h4>
           <div class="stat-item">
             <span>Locations:</span>
-            <strong id="location-count">0</strong>
+            <strong id="location-count">Loading...</strong>
           </div>
           <div class="stat-item">
             <span>ZIP Codes:</span>
-            <strong id="zip-count">0</strong>
+            <strong id="zip-count">Loading...</strong>
           </div>
           <div class="stat-item">
             <span>Visible:</span>
-            <strong id="visible-count">0</strong>
+            <strong id="visible-count">Loading...</strong>
           </div>
         </div>
 
-        <!-- Filters -->
+        <!-- FILTERS -->
         <div class="filter-section">
           <h3>🎯 Filters</h3>
 
+          <!-- What metric to show -->
           <div class="filter-group">
             <label>Demographic Metric</label>
             <select id="metric-filter">
@@ -243,6 +256,7 @@
             </select>
           </div>
 
+          <!-- Filter by income level -->
           <div class="filter-group">
             <label>Income Range</label>
             <select id="income-filter">
@@ -254,6 +268,7 @@
             </select>
           </div>
 
+          <!-- Filter by business type -->
           <div class="filter-group">
             <label>Business Type</label>
             <select id="business-filter">
@@ -261,9 +276,12 @@
               <option value="coffee">Coffee Shop</option>
               <option value="fitness">Fitness</option>
               <option value="restaurant">Restaurant</option>
+              <option value="retail">Retail</option>
+              <option value="service">Service</option>
             </select>
           </div>
 
+          <!-- Search by ZIP -->
           <div class="filter-group">
             <label>Search ZIP Code</label>
             <input
@@ -274,7 +292,7 @@
           </div>
         </div>
 
-        <!-- Legend -->
+        <!-- LEGEND -->
         <div class="legend">
           <h4>Legend - Income Levels</h4>
           <div class="legend-item">
@@ -300,40 +318,40 @@
         </div>
       </div>
 
-      <!-- Map -->
+      <!-- RIGHT SIDE - THE MAP -->
       <div id="map"></div>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet JavaScript library -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Map JavaScript -->
+    <!-- Our custom map code -->
     <script>
-      // Initialize map centered on Kansas City
+      // Initialize the map - centered on Kansas City
       const map = L.map("map").setView([39.0997, -94.5786], 10);
 
-      // Add tile layer (OpenStreetMap)
+      // Add the base map tiles (streets, buildings, etc.)
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
         maxZoom: 18,
       }).addTo(map);
 
-      // Store layers for filtering
-      let demographicCircles = [];
-      let locationMarkers = [];
+      // Arrays to store our map layers so we can filter them later
+      let demographicCircles = []; // Colored circles for ZIP codes
+      let locationMarkers = []; // Markers for business locations
 
-      // Fetch and display data
+      // Function to load all the data from our API
       async function loadMapData() {
         try {
-          // Fetch demographics
+          // Fetch demographic data
           const demoResponse = await fetch("/api/demographics");
           const demoData = await demoResponse.json();
 
-          // Fetch locations
+          // Fetch business locations
           const locResponse = await fetch("/api/locations");
           const locData = await locResponse.json();
 
-          // Update stats
+          // Update the stats in the sidebar
           document.getElementById("location-count").textContent =
             locData.count || 0;
           document.getElementById("zip-count").textContent =
@@ -341,65 +359,63 @@
           document.getElementById("visible-count").textContent =
             (locData.count || 0) + (demoData.count || 0);
 
-          // Display demographics as colored circles
-          if (demoData.demographics) {
+          // Display demographic data as colored circles
+          if (demoData.demographics && demoData.demographics.length > 0) {
             demoData.demographics.forEach((demo) => {
+              // Get color based on income level
               const color = getIncomeColor(demo.median_income);
+
+              // Size based on population
               const radius = Math.sqrt(demo.population || 5000) * 3;
 
-              const circle = L.circle(
-                [
-                  demo.city === "Kansas City"
-                    ? 39.0997
-                    : demo.city === "Overland Park"
-                    ? 38.9822
-                    : demo.city === "Grandview"
-                    ? 38.8861
-                    : 39.0399,
-                  demo.city === "Kansas City" && demo.zip_code === "64101"
-                    ? -94.5786
-                    : demo.city === "Overland Park"
-                    ? -94.6708
-                    : demo.city === "Grandview"
-                    ? -94.5333
-                    : -94.5919,
-                ],
-                {
+              // We need coordinates - using a simple lookup for now
+              const coords = getZipCoordinates(demo.zip_code, demo.city);
+
+              if (coords) {
+                // Create a circle on the map
+                const circle = L.circle(coords, {
                   color: color,
                   fillColor: color,
                   fillOpacity: 0.4,
                   radius: radius,
                   weight: 2,
-                }
-              ).addTo(map);
+                }).addTo(map);
 
-              circle.bindPopup(`
-                            <div class="popup-title">ZIP: ${demo.zip_code}</div>
-                            <div class="popup-row"><strong>City:</strong> ${
-                              demo.city
-                            }, ${demo.state}</div>
-                            <div class="popup-row"><strong>Population:</strong> ${
-                              demo.population?.toLocaleString() || "N/A"
-                            }</div>
-                            <div class="popup-row"><strong>Median Income:</strong> $${
-                              demo.median_income?.toLocaleString() || "N/A"
-                            }</div>
-                            <div class="popup-row"><strong>Income Range:</strong> ${
-                              demo.income_range
-                            }</div>
-                            <div class="popup-row"><strong>Home Value:</strong> $${
-                              demo.median_home_value?.toLocaleString() || "N/A"
-                            }</div>
-                        `);
+                // Add popup that shows when you click the circle
+                circle.bindPopup(`
+                                <div class="popup-title">ZIP: ${
+                                  demo.zip_code
+                                }</div>
+                                <div class="popup-row"><strong>City:</strong> ${
+                                  demo.city
+                                }, ${demo.state}</div>
+                                <div class="popup-row"><strong>Population:</strong> ${
+                                  demo.population?.toLocaleString() || "N/A"
+                                }</div>
+                                <div class="popup-row"><strong>Median Income:</strong> $${
+                                  demo.median_income?.toLocaleString() || "N/A"
+                                }</div>
+                                <div class="popup-row"><strong>Income Range:</strong> ${
+                                  demo.income_range
+                                }</div>
+                                <div class="popup-row"><strong>Home Value:</strong> $${
+                                  demo.median_home_value?.toLocaleString() ||
+                                  "N/A"
+                                }</div>
+                            `);
 
-              demographicCircles.push({ circle, data: demo });
+                // Store it so we can filter it later
+                demographicCircles.push({ circle, data: demo });
+              }
             });
           }
 
           // Display business locations as markers
-          if (locData.locations) {
+          if (locData.locations && locData.locations.length > 0) {
             locData.locations.forEach((loc) => {
+              // Only add if we have coordinates
               if (loc.latitude && loc.longitude) {
+                // Create a marker
                 const marker = L.marker([loc.latitude, loc.longitude], {
                   icon: L.divIcon({
                     className: "custom-marker",
@@ -408,6 +424,7 @@
                   }),
                 }).addTo(map);
 
+                // Add popup for when you click the marker
                 marker.bindPopup(`
                                 <div class="popup-title">${loc.name}</div>
                                 <div class="popup-row"><strong>Type:</strong> ${
@@ -430,19 +447,52 @@
           }
         } catch (error) {
           console.error("Error loading map data:", error);
+          alert("Error loading map data. Please refresh the page.");
         }
       }
 
-      // Get color based on income
+      // Function to determine color based on income
       function getIncomeColor(income) {
-        if (!income) return "#9e9e9e";
-        if (income < 40000) return "#ef5350"; // Red
-        if (income < 75000) return "#ffa726"; // Orange
-        if (income < 120000) return "#66bb6a"; // Green
-        return "#42a5f5"; // Blue
+        if (!income) return "#9e9e9e"; // Gray for unknown
+        if (income < 40000) return "#ef5350"; // Red for low
+        if (income < 75000) return "#ffa726"; // Orange for middle
+        if (income < 120000) return "#66bb6a"; // Green for upper middle
+        return "#42a5f5"; // Blue for high
       }
 
-      // Filter functionality
+      // Comprehensive ZIP code coordinate lookup
+      function getZipCoordinates(zipCode, city) {
+        // Coordinates for your target regions
+        const zipCoords = {
+          // Atlantic Iowa Region
+          50022: [41.5914, -94.7633], // Anita, IA
+          50025: [41.4036, -95.0139], // Atlantic, IA
+          51520: [41.2619, -95.8608], // Council Bluffs, IA
+          51601: [40.7658, -95.3769], // Shenandoah, IA
+
+          // St. Joseph Missouri Region
+          64501: [39.7684, -94.8467], // Saint Joseph, MO
+          64503: [39.7447, -94.8163], // Saint Joseph, MO (North)
+
+          // Leavenworth Kansas Region
+          66027: [39.3111, -94.9225], // Leavenworth, KS
+          66048: [39.3697, -94.9858], // Leavenworth, KS (North)
+          66002: [39.5631, -95.1218], // Atchison, KS
+
+          // Kansas City Metro
+          64101: [39.0997, -94.5786], // Kansas City, MO (Downtown)
+          64112: [39.0399, -94.5919], // Kansas City, MO (Plaza)
+          64030: [38.8861, -94.5333], // Grandview, MO
+          66207: [38.9822, -94.6708], // Overland Park, KS
+        };
+
+        // Return coordinates if found, otherwise default to Kansas City
+        return zipCoords[zipCode] || [39.0997, -94.5786];
+      }
+
+      // FILTER FUNCTIONALITY
+      // When user changes filters, update what's visible on the map
+
       document
         .getElementById("income-filter")
         .addEventListener("change", applyFilters);
@@ -465,10 +515,11 @@
 
         let visibleCount = 0;
 
-        // Filter demographics
+        // Filter demographic circles
         demographicCircles.forEach(({ circle, data }) => {
           let show = true;
 
+          // Check income filter
           if (incomeFilter !== "all") {
             const income = data.median_income || 0;
             if (incomeFilter === "low" && income >= 40000) show = false;
@@ -485,10 +536,12 @@
             if (incomeFilter === "high" && income < 120000) show = false;
           }
 
+          // Check ZIP search
           if (zipSearch && !data.zip_code.toLowerCase().includes(zipSearch)) {
             show = false;
           }
 
+          // Show or hide the circle
           if (show) {
             circle.addTo(map);
             visibleCount++;
@@ -497,19 +550,22 @@
           }
         });
 
-        // Filter locations
+        // Filter location markers
         locationMarkers.forEach(({ marker, data }) => {
           let show = true;
 
+          // Check business type filter
           if (businessFilter !== "all") {
             const type = (data.business_type || "").toLowerCase();
             if (!type.includes(businessFilter.toLowerCase())) show = false;
           }
 
+          // Check ZIP search
           if (zipSearch && !data.zip_code.toLowerCase().includes(zipSearch)) {
             show = false;
           }
 
+          // Show or hide the marker
           if (show) {
             marker.addTo(map);
             visibleCount++;
@@ -518,10 +574,11 @@
           }
         });
 
+        // Update visible count
         document.getElementById("visible-count").textContent = visibleCount;
       }
 
-      // Load data when page loads
+      // Load the data when page loads
       loadMapData();
     </script>
   </body>

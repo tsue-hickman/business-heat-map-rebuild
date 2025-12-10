@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Location - Business Heat Map</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .form-row.full {
+        grid-template-columns: 1fr;
+      }
+
+      .help-text {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .optional-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .optional-section h3 {
+        margin-top: 0;
+        font-size: 1.1em;
+        color: #555;
+      }
+
+      /* Search box styling */
+      .zip-search-wrapper {
+        position: relative;
+      }
+
+      .zip-search-input {
+        width: 100%;
+        padding: 10px 35px 10px 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 18px;
+      }
+
+      .zip-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 2px solid #667eea;
+        border-top: none;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      .zip-dropdown.show {
+        display: block;
+      }
+
+      .zip-option {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      }
+
+      .zip-option:hover {
+        background: #f0f0f0;
+      }
+
+      .zip-option:last-child {
+        border-bottom: none;
+      }
+
+      .zip-code-text {
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .city-text {
+        color: #666;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <div class="dashboard-header">
+          <h1>📍 Add Business Location</h1>
+          <div class="user-info">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm"
+              >← Back to Dashboard</a
+            >
+          </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <div class="info-box">
+          <h2>Location Information</h2>
+          <p>
+            Add a new business location to track on the heat map. All fields
+            marked with * are required.
+          </p>
+
+          <form method="POST" action="{{ url_for('main.add_location') }}">
+            <!-- Business Name -->
+            <div class="form-group">
+              <label for="name">Business/Property Name *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                placeholder="e.g., Smith Residence, ABC Corp Office"
+              />
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+              <label for="address">Street Address *</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                required
+                placeholder="e.g., 123 Main Street"
+              />
+            </div>
+
+            <!-- ZIP Code with Search/Dropdown -->
+            <div class="form-group">
+              <label for="zip_code">ZIP Code * (Search or Select)</label>
+              <div class="zip-search-wrapper">
+                <input
+                  type="text"
+                  id="zip_code"
+                  name="zip_code"
+                  class="zip-search-input"
+                  placeholder="Type to search ZIP codes..."
+                  required
+                  autocomplete="off"
+                />
+                <span class="search-icon">🔍</span>
+                <div id="zip-dropdown" class="zip-dropdown"></div>
+              </div>
+              <small class="help-text"
+                >Start typing ZIP code or city name</small
+              >
+            </div>
+
+            <!-- City and State (auto-filled from ZIP selection) -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City *</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  required
+                  placeholder="Auto-filled from ZIP"
+                  readonly
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="state">State *</label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  required
+                  placeholder="Auto-filled"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <!-- Business Type -->
+            <div class="form-group">
+              <label for="business_type">Property Type *</label>
+              <select id="business_type" name="business_type" required>
+                <option value="">Select Type...</option>
+                <option value="residential">Residential Home</option>
+                <option value="office">Office Building</option>
+                <option value="retail">Retail Store</option>
+                <option value="restaurant">Restaurant</option>
+                <option value="medical">Medical Facility</option>
+                <option value="hotel">Hotel/Hospitality</option>
+                <option value="education">School/University</option>
+                <option value="warehouse">Warehouse/Industrial</option>
+                <option value="government">Government Building</option>
+                <option value="religious">Church/Religious</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <!-- Optional: Coordinates -->
+            <div class="optional-section">
+              <h3>📍 Exact Coordinates (Optional)</h3>
+              <p style="font-size: 0.9em; color: #666">
+                Coordinates will be auto-filled based on ZIP code. You can
+                override if needed.
+              </p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="latitude">Latitude</label>
+                  <input
+                    type="number"
+                    id="latitude"
+                    name="latitude"
+                    step="any"
+                    placeholder="e.g., 39.0997"
+                    readonly
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="longitude">Longitude</label>
+                  <input
+                    type="number"
+                    id="longitude"
+                    name="longitude"
+                    step="any"
+                    placeholder="e.g., -94.5786"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group">
+              <label for="notes">Notes (Optional)</label>
+              <textarea
+                id="notes"
+                name="notes"
+                rows="4"
+                placeholder="Window count, special requirements, etc..."
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-block">
+                ✅ Add Location
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div
+          class="info-box"
+          style="background: #e7f3ff; border-left: 4px solid #2196f3"
+        >
+          <h3 style="margin-top: 0">💡 Quick Tip</h3>
+          <p>
+            After adding your location, view it on the interactive heat map to
+            see demographic data for the area (median income, population, home
+            values).
+          </p>
+          <a href="{{ url_for('main.map_view') }}" class="btn btn-sm"
+            >View Map</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ZIP code data with coordinates
+      const zipData = {
+        // Atlantic Iowa Region
+        50022: { city: "Anita", state: "IA", lat: 41.5914, lng: -94.7633 },
+        50025: { city: "Atlantic", state: "IA", lat: 41.4036, lng: -95.0139 },
+        51520: {
+          city: "Council Bluffs",
+          state: "IA",
+          lat: 41.2619,
+          lng: -95.8608,
+        },
+        51601: { city: "Shenandoah", state: "IA", lat: 40.7658, lng: -95.3769 },
+
+        // St. Joseph Missouri Region
+        64501: {
+          city: "Saint Joseph",
+          state: "MO",
+          lat: 39.7684,
+          lng: -94.8467,
+        },
+        64503: {
+          city: "Saint Joseph",
+          state: "MO",
+          lat: 39.7447,
+          lng: -94.8163,
+        },
+
+        // Leavenworth Kansas Region
+        66027: {
+          city: "Leavenworth",
+          state: "KS",
+          lat: 39.3111,
+          lng: -94.9225,
+        },
+        66048: {
+          city: "Leavenworth",
+          state: "KS",
+          lat: 39.3697,
+          lng: -94.9858,
+        },
+        66002: { city: "Atchison", state: "KS", lat: 39.5631, lng: -95.1218 },
+
+        // Kansas City Metro
+        64101: {
+          city: "Kansas City",
+          state: "MO",
+          lat: 39.0997,
+          lng: -94.5786,
+        },
+        64112: {
+          city: "Kansas City",
+          state: "MO",
+          lat: 39.0399,
+          lng: -94.5919,
+        },
+        64030: { city: "Grandview", state: "MO", lat: 38.8861, lng: -94.5333 },
+        66207: {
+          city: "Overland Park",
+          state: "KS",
+          lat: 38.9822,
+          lng: -94.6708,
+        },
+      };
+
+      const zipInput = document.getElementById("zip_code");
+      const zipDropdown = document.getElementById("zip-dropdown");
+      const cityInput = document.getElementById("city");
+      const stateInput = document.getElementById("state");
+      const latInput = document.getElementById("latitude");
+      const lngInput = document.getElementById("longitude");
+
+      // Search/filter ZIP codes as user types
+      zipInput.addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+
+        if (searchTerm.length === 0) {
+          zipDropdown.classList.remove("show");
+          return;
+        }
+
+        // Filter ZIP codes
+        const matches = Object.entries(zipData).filter(([zip, data]) => {
+          return (
+            zip.includes(searchTerm) ||
+            data.city.toLowerCase().includes(searchTerm) ||
+            data.state.toLowerCase().includes(searchTerm)
+          );
+        });
+
+        // Show dropdown with results
+        if (matches.length > 0) {
+          zipDropdown.innerHTML = matches
+            .map(
+              ([zip, data]) => `
+                    <div class="zip-option" data-zip="${zip}">
+                        <span class="zip-code-text">${zip}</span> - 
+                        <span class="city-text">${data.city}, ${data.state}</span>
+                    </div>
+                `
+            )
+            .join("");
+          zipDropdown.classList.add("show");
+
+          // Add click handlers to options
+          document.querySelectorAll(".zip-option").forEach((option) => {
+            option.addEventListener("click", function () {
+              selectZip(this.dataset.zip);
+            });
+          });
+        } else {
+          zipDropdown.classList.remove("show");
+        }
+      });
+
+      // Select a ZIP code
+      function selectZip(zip) {
+        const data = zipData[zip];
+
+        zipInput.value = zip;
+        cityInput.value = data.city;
+        stateInput.value = data.state;
+        latInput.value = data.lat;
+        lngInput.value = data.lng;
+
+        zipDropdown.classList.remove("show");
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".zip-search-wrapper")) {
+          zipDropdown.classList.remove("show");
+        }
+      });
+
+      // Show all options when clicking in the input
+      zipInput.addEventListener("focus", function () {
+        if (this.value.length > 0) {
+          this.dispatchEvent(new Event("input"));
+        }
+      });
+    </script>
+  </body>
+</html>
