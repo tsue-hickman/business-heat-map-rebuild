@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Heat Map - Business Location Intelligence</title>
-
-    <!-- Leaflet CSS for the map -->
+    <title>Heat Map - Lead Finder</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
       * {
         margin: 0;
@@ -23,563 +24,903 @@
         overflow: hidden;
       }
 
-      /* Main layout - sidebar next to map */
-      .map-container {
-        display: flex;
-        height: 100vh;
-      }
-
-      /* Left sidebar with controls */
-      .sidebar {
-        width: 350px;
+      /* Header Bar */
+      .header-bar {
         background: white;
-        padding: 20px;
-        overflow-y: auto;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-      }
-
-      .sidebar h1 {
-        margin: 0 0 15px 0;
-        font-size: 1.5em;
-        color: #333;
-      }
-
-      /* User info bar at top of sidebar */
-      .user-info-bar {
+        height: 60px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #eee;
-        flex-wrap: wrap;
-        gap: 10px;
+        justify-content: space-between;
+        padding: 0 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1001;
+        position: relative;
       }
 
-      .btn-small {
-        padding: 8px 15px;
-        font-size: 0.85em;
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .admin-menu-btn {
         background: #667eea;
         color: white;
         border: none;
+        padding: 10px 15px;
         border-radius: 5px;
         cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
+        font-size: 1.2em;
       }
 
-      .btn-small:hover {
+      .admin-menu-btn:hover {
         background: #5568d3;
       }
 
-      /* Stats box showing counts */
-      .stats-box {
-        padding: 15px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 8px;
-        margin-bottom: 20px;
+      .logo {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #333;
       }
 
-      .stats-box h4 {
-        margin: 0 0 10px 0;
+      .user-menu-btn {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #333;
       }
 
-      .stat-item {
+      /* Main Container */
+      .main-container {
         display: flex;
-        justify-content: space-between;
-        margin: 5px 0;
-        font-size: 0.95em;
+        height: calc(100vh - 60px);
       }
 
-      /* Filter sections */
-      .filter-section {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 8px;
+      /* Left Sidebar - CarMax Style */
+      .left-sidebar {
+        width: 320px;
+        background: white;
+        overflow-y: auto;
+        border-right: 1px solid #e0e0e0;
+        transition: transform 0.3s;
       }
 
-      .filter-section h3 {
-        margin: 0 0 15px 0;
+      .left-sidebar.collapsed {
+        transform: translateX(-320px);
+      }
+
+      .sidebar-section {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .sidebar-section h3 {
         font-size: 1.1em;
-        color: #555;
-      }
-
-      .filter-group {
         margin-bottom: 15px;
+        color: #333;
       }
 
-      .filter-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #666;
-        font-size: 0.9em;
+      /* Search Bar */
+      .search-box {
+        position: relative;
+        margin-bottom: 20px;
       }
 
-      .filter-group select,
-      .filter-group input {
+      .search-box input {
         width: 100%;
-        padding: 10px;
-        border: 2px solid #ddd;
-        border-radius: 6px;
+        padding: 12px 40px 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
         font-size: 1em;
       }
 
-      .filter-group select:focus,
-      .filter-group input:focus {
+      .search-box input:focus {
         outline: none;
         border-color: #667eea;
       }
 
-      /* Legend showing what colors mean */
-      .legend {
-        padding: 15px;
-        background: white;
-        border-radius: 8px;
-        border: 2px solid #eee;
-        margin-top: 20px;
+      .search-box i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
       }
 
-      .legend h4 {
-        margin: 0 0 10px 0;
+      /* Featured Options */
+      .featured-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .featured-btn {
+        padding: 12px;
+        background: #f5f5f5;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: left;
+        font-size: 0.95em;
+      }
+
+      .featured-btn:hover {
+        background: #e8e8e8;
+      }
+
+      .featured-btn.active {
+        background: #e7f3ff;
+        border-color: #667eea;
+        color: #667eea;
+        font-weight: 600;
+      }
+
+      /* Filter Buttons */
+      .filter-group {
+        margin-bottom: 20px;
+      }
+
+      .filter-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9em;
+      }
+
+      .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.3s;
+      }
+
+      .filter-btn:hover {
+        border-color: #667eea;
+      }
+
+      .filter-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+
+      /* Refresh Button */
+      .refresh-btn {
+        width: 100%;
+        padding: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
         font-size: 1em;
+        font-weight: 600;
+        margin-top: 15px;
+      }
+
+      .refresh-btn:hover {
+        background: #5568d3;
+      }
+
+      /* Map Container */
+      #map {
+        flex: 1;
+        height: 100%;
+      }
+
+      /* Admin Sidebar */
+      .admin-sidebar {
+        position: fixed;
+        left: -300px;
+        top: 60px;
+        width: 300px;
+        height: calc(100vh - 60px);
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      .admin-sidebar.open {
+        left: 0;
+      }
+
+      .admin-sidebar h3 {
+        margin-bottom: 15px;
         color: #333;
+      }
+
+      .stat-item {
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* User Menu */
+      .user-menu {
+        position: fixed;
+        right: -350px;
+        top: 60px;
+        width: 350px;
+        height: calc(100vh - 60px);
+        background: #1a1a1a;
+        color: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+        transition: right 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .user-menu.open {
+        right: 0;
+      }
+
+      .user-profile {
+        padding: 30px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        text-align: center;
+      }
+
+      .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2em;
+        margin: 0 auto 15px;
+      }
+
+      .user-name {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .menu-items {
+        padding: 20px;
+      }
+
+      .menu-item {
+        padding: 15px;
+        border-bottom: 1px solid #333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: background 0.3s;
+      }
+
+      .menu-item:hover {
+        background: #2a2a2a;
+      }
+
+      .menu-item i {
+        font-size: 1.2em;
+        color: #667eea;
+      }
+
+      .logout-btn {
+        margin: 20px;
+        padding: 12px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        width: calc(100% - 40px);
+        font-size: 1em;
+      }
+
+      .logout-btn:hover {
+        background: #c82333;
+      }
+
+      /* Legend */
+      .map-legend {
+        position: absolute;
+        bottom: 20px;
+        left: 340px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 400;
+      }
+
+      .legend-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 0.9em;
       }
 
       .legend-item {
         display: flex;
         align-items: center;
-        margin: 8px 0;
-        font-size: 0.9em;
+        margin: 5px 0;
+        font-size: 0.85em;
       }
 
       .legend-color {
-        width: 30px;
-        height: 20px;
-        border-radius: 4px;
-        margin-right: 10px;
-        border: 1px solid #ddd;
+        width: 25px;
+        height: 15px;
+        border-radius: 3px;
+        margin-right: 8px;
       }
 
-      /* The map takes up the rest of the space */
-      #map {
-        flex: 1;
-        height: 100vh;
+      /* Save Address Button */
+      .save-address-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.85em;
+        margin-top: 10px;
       }
 
-      /* Popup styling when you click on the map */
-      .leaflet-popup-content {
-        margin: 10px;
-        font-size: 0.9em;
+      .save-address-btn:hover {
+        background: #218838;
       }
 
-      .popup-title {
-        font-weight: bold;
-        font-size: 1.1em;
-        margin-bottom: 8px;
-        color: #333;
-      }
-
-      .popup-row {
-        margin: 5px 0;
-        color: #666;
-      }
-
-      /* Mobile responsive - stack sidebar on top */
       @media (max-width: 768px) {
-        .map-container {
-          flex-direction: column;
+        .left-sidebar {
+          position: absolute;
+          z-index: 999;
+          height: calc(100vh - 60px);
         }
-
-        .sidebar {
-          width: 100%;
-          height: auto;
-          max-height: 40vh;
-        }
-
-        #map {
-          height: 60vh;
+        .map-legend {
+          left: 20px;
         }
       }
     </style>
   </head>
   <body>
-    <div class="map-container">
-      <!-- LEFT SIDEBAR -->
-      <div class="sidebar">
-        <h1>🗺️ Business Heat Map</h1>
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="header-left">
+        {% if current_user.is_admin %}
+        <button class="admin-menu-btn" onclick="toggleAdminMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        {% endif %}
+        <div class="logo">🗺️ Lead Finder</div>
+      </div>
+      <button class="user-menu-btn" onclick="toggleUserMenu()">
+        <i class="fas fa-user-circle"></i>
+      </button>
+    </div>
 
-        <!-- User info -->
-        <div class="user-info-bar">
-          {% if current_user.is_authenticated %}
-          <span>👤 {{ current_user.username }}</span>
-          <a href="{{ url_for('main.dashboard') }}" class="btn-small"
-            >Dashboard</a
-          >
-          {% else %}
-          <span>Guest Mode</span>
-          <a href="{{ url_for('auth.login') }}" class="btn-small">Login</a>
-          {% endif %}
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-box">
-          <h4>📊 Map Statistics</h4>
-          <div class="stat-item">
-            <span>Locations:</span>
-            <strong id="location-count">Loading...</strong>
-          </div>
-          <div class="stat-item">
-            <span>ZIP Codes:</span>
-            <strong id="zip-count">Loading...</strong>
-          </div>
-          <div class="stat-item">
-            <span>Visible:</span>
-            <strong id="visible-count">Loading...</strong>
-          </div>
-        </div>
-
-        <!-- FILTERS -->
-        <div class="filter-section">
-          <h3>🎯 Filters</h3>
-
-          <!-- What metric to show -->
-          <div class="filter-group">
-            <label>Demographic Metric</label>
-            <select id="metric-filter">
-              <option value="income">Median Income</option>
-              <option value="population">Population</option>
-              <option value="home_value">Home Value</option>
-            </select>
-          </div>
-
-          <!-- Filter by income level -->
-          <div class="filter-group">
-            <label>Income Range</label>
-            <select id="income-filter">
-              <option value="all">All Income Levels</option>
-              <option value="low">Low Income (&lt;$40k)</option>
-              <option value="middle">Middle Income ($40k-$75k)</option>
-              <option value="upper">Upper Middle ($75k-$120k)</option>
-              <option value="high">High Income (&gt;$120k)</option>
-            </select>
-          </div>
-
-          <!-- Filter by business type -->
-          <div class="filter-group">
-            <label>Business Type</label>
-            <select id="business-filter">
-              <option value="all">All Types</option>
-              <option value="coffee">Coffee Shop</option>
-              <option value="fitness">Fitness</option>
-              <option value="restaurant">Restaurant</option>
-              <option value="retail">Retail</option>
-              <option value="service">Service</option>
-            </select>
-          </div>
-
-          <!-- Search by ZIP -->
-          <div class="filter-group">
-            <label>Search ZIP Code</label>
+    <div class="main-container">
+      <!-- Left Sidebar - Filters -->
+      <div class="left-sidebar" id="leftSidebar">
+        <!-- Search Section -->
+        <div class="sidebar-section">
+          <h3>Search Locations</h3>
+          <div class="search-box">
             <input
               type="text"
               id="zip-search"
-              placeholder="Enter ZIP code..."
+              placeholder="Enter ZIP code or city..."
             />
+            <i class="fas fa-search"></i>
+          </div>
+
+          <div class="featured-options">
+            <button class="featured-btn" onclick="setFeatured('high-income')">
+              💰 High Income Areas
+            </button>
+            <button class="featured-btn" onclick="setFeatured('suburban')">
+              🏡 Suburban Neighborhoods
+            </button>
+            <button class="featured-btn" onclick="setFeatured('new-builds')">
+              🏗️ New Construction Zones
+            </button>
           </div>
         </div>
 
-        <!-- LEGEND -->
-        <div class="legend">
-          <h4>Legend - Income Levels</h4>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #ef5350"></div>
-            <span>Low Income (&lt;$40k)</span>
+        <!-- Income Filter -->
+        <div class="sidebar-section">
+          <div class="filter-group">
+            <span class="filter-label">Income Level</span>
+            <div class="filter-buttons">
+              <button class="filter-btn" data-filter="income" data-value="low">
+                &lt; $40k
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="income"
+                data-value="middle"
+              >
+                $40k-$75k
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="income"
+                data-value="upper"
+              >
+                $75k-$120k
+              </button>
+              <button class="filter-btn" data-filter="income" data-value="high">
+                &gt; $120k
+              </button>
+            </div>
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #ffa726"></div>
-            <span>Middle Income ($40k-$75k)</span>
+        </div>
+
+        <!-- Population Filter -->
+        <div class="sidebar-section">
+          <div class="filter-group">
+            <span class="filter-label">Population Size</span>
+            <div class="filter-buttons">
+              <button
+                class="filter-btn"
+                data-filter="population"
+                data-value="small"
+              >
+                &lt; 1,000
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="population"
+                data-value="medium"
+              >
+                1,000-10,000
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="population"
+                data-value="large"
+              >
+                &gt; 10,000
+              </button>
+            </div>
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #66bb6a"></div>
-            <span>Upper Middle ($75k-$120k)</span>
+        </div>
+
+        <!-- Home Value Filter -->
+        <div class="sidebar-section">
+          <div class="filter-group">
+            <span class="filter-label">Home Value</span>
+            <div class="filter-buttons">
+              <button
+                class="filter-btn"
+                data-filter="home-value"
+                data-value="low"
+              >
+                &lt; $100k
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="home-value"
+                data-value="mid"
+              >
+                $100k-$200k
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="home-value"
+                data-value="high"
+              >
+                &gt; $200k
+              </button>
+            </div>
           </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #42a5f5"></div>
-            <span>High Income (&gt;$120k)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #667eea"></div>
-            <span>📍 Business Locations</span>
-          </div>
+
+          <button class="refresh-btn" onclick="refreshFilters()">
+            <i class="fas fa-redo"></i> Reset All Filters
+          </button>
         </div>
       </div>
 
-      <!-- RIGHT SIDE - THE MAP -->
+      <!-- Map -->
       <div id="map"></div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <div class="legend-title">Lead Density</div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #dc3545"></div>
+          <span>Low (&lt;$40k)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ffc107"></div>
+          <span>Middle ($40k-$75k)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #28a745"></div>
+          <span>Upper ($75k-$120k)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #007bff"></div>
+          <span>High (&gt;$120k)</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Leaflet JavaScript library -->
+    <!-- Admin Sidebar -->
+    {% if current_user.is_admin %}
+    <div class="admin-sidebar" id="adminSidebar">
+      <h3>Admin Dashboard</h3>
+      <div class="stat-item">
+        <span>Total Users:</span>
+        <strong id="admin-users">-</strong>
+      </div>
+      <div class="stat-item">
+        <span>Locations:</span>
+        <strong id="admin-locations">-</strong>
+      </div>
+      <div class="stat-item">
+        <span>Demographics:</span>
+        <strong id="admin-demographics">-</strong>
+      </div>
+      <div class="stat-item">
+        <span>Saved Addresses:</span>
+        <strong id="admin-saved">-</strong>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- User Menu -->
+    <div class="user-menu" id="userMenu">
+      <div class="user-profile">
+        <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+        <div class="user-name">{{ current_user.username }}</div>
+        <div style="font-size: 0.9em; opacity: 0.9">
+          {{ current_user.email or 'No email set' }}
+        </div>
+      </div>
+
+      <div class="menu-items">
+        <div class="menu-item" onclick="location.href='/profile'">
+          <i class="fas fa-user-edit"></i>
+          <span>Edit Profile</span>
+        </div>
+        <div class="menu-item" onclick="location.href='/search-history'">
+          <i class="fas fa-history"></i>
+          <span>Search History</span>
+        </div>
+        <div class="menu-item" onclick="location.href='/saved-addresses'">
+          <i class="fas fa-bookmark"></i>
+          <span>Saved Addresses</span>
+        </div>
+        {% if current_user.is_admin %}
+        <div class="menu-item" onclick="location.href='/admin'">
+          <i class="fas fa-shield-alt"></i>
+          <span>Admin Panel</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.logout') }}">
+        <button type="submit" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </form>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Our custom map code -->
     <script>
-      // Initialize the map - centered on Kansas City
-      const map = L.map("map").setView([39.0997, -94.5786], 10);
+      const map = L.map("map").setView([40.5, -95.0], 7);
 
-      // Add the base map tiles (streets, buildings, etc.)
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
         maxZoom: 18,
       }).addTo(map);
 
-      // Arrays to store our map layers so we can filter them later
-      let demographicCircles = []; // Colored circles for ZIP codes
-      let locationMarkers = []; // Markers for business locations
+      let demographicCircles = [];
+      let activeFilters = {
+        income: [],
+        population: [],
+        homeValue: [],
+        search: "",
+      };
 
-      // Function to load all the data from our API
-      async function loadMapData() {
-        try {
-          // Fetch demographic data
-          const demoResponse = await fetch("/api/demographics");
-          const demoData = await demoResponse.json();
+      const zipCoords = {
+        50022: [41.5914, -94.7633],
+        50025: [41.4036, -95.0139],
+        50833: [41.4778, -95.3378],
+        50837: [41.2292, -95.4169],
+        50076: [41.2711, -94.8658],
+        50839: [41.8203, -95.3414],
+        50841: [41.7817, -95.4336],
+        50117: [41.5911, -95.0589],
+        50843: [41.1467, -95.1622],
+        50846: [41.2336, -95.1386],
+        50847: [41.3928, -95.3658],
+        50848: [41.6531, -95.3256],
+        50857: [41.305, -95.0847],
+        50859: [41.4603, -95.1022],
+        50862: [41.2539, -94.7692],
+        50864: [41.3122, -95.3947],
+        51520: [41.2619, -95.8608],
+        51521: [41.2358, -95.8472],
+        51523: [41.2878, -95.7961],
+        51601: [40.7658, -95.3769],
+        51631: [40.7406, -95.0372],
+        51632: [40.6072, -95.6544],
+        64501: [39.7684, -94.8467],
+        64503: [39.7447, -94.8163],
+        64504: [39.7905, -94.7961],
+        64505: [39.7275, -94.8769],
+        66027: [39.3111, -94.9225],
+        66048: [39.3697, -94.9858],
+        66002: [39.5631, -95.1218],
+        66043: [39.3553, -94.9178],
+        66012: [39.0589, -94.8836],
+        64101: [39.0997, -94.5786],
+        64112: [39.0399, -94.5919],
+        64030: [38.8861, -94.5333],
+        66207: [38.9822, -94.6708],
+      };
 
-          // Fetch business locations
-          const locResponse = await fetch("/api/locations");
-          const locData = await locResponse.json();
-
-          // Update the stats in the sidebar
-          document.getElementById("location-count").textContent =
-            locData.count || 0;
-          document.getElementById("zip-count").textContent =
-            demoData.count || 0;
-          document.getElementById("visible-count").textContent =
-            (locData.count || 0) + (demoData.count || 0);
-
-          // Display demographic data as colored circles
-          if (demoData.demographics && demoData.demographics.length > 0) {
-            demoData.demographics.forEach((demo) => {
-              // Get color based on income level
-              const color = getIncomeColor(demo.median_income);
-
-              // Size based on population
-              const radius = Math.sqrt(demo.population || 5000) * 3;
-
-              // We need coordinates - using a simple lookup for now
-              const coords = getZipCoordinates(demo.zip_code, demo.city);
-
-              if (coords) {
-                // Create a circle on the map
-                const circle = L.circle(coords, {
-                  color: color,
-                  fillColor: color,
-                  fillOpacity: 0.4,
-                  radius: radius,
-                  weight: 2,
-                }).addTo(map);
-
-                // Add popup that shows when you click the circle
-                circle.bindPopup(`
-                                <div class="popup-title">ZIP: ${
-                                  demo.zip_code
-                                }</div>
-                                <div class="popup-row"><strong>City:</strong> ${
-                                  demo.city
-                                }, ${demo.state}</div>
-                                <div class="popup-row"><strong>Population:</strong> ${
-                                  demo.population?.toLocaleString() || "N/A"
-                                }</div>
-                                <div class="popup-row"><strong>Median Income:</strong> $${
-                                  demo.median_income?.toLocaleString() || "N/A"
-                                }</div>
-                                <div class="popup-row"><strong>Income Range:</strong> ${
-                                  demo.income_range
-                                }</div>
-                                <div class="popup-row"><strong>Home Value:</strong> $${
-                                  demo.median_home_value?.toLocaleString() ||
-                                  "N/A"
-                                }</div>
-                            `);
-
-                // Store it so we can filter it later
-                demographicCircles.push({ circle, data: demo });
-              }
-            });
-          }
-
-          // Display business locations as markers
-          if (locData.locations && locData.locations.length > 0) {
-            locData.locations.forEach((loc) => {
-              // Only add if we have coordinates
-              if (loc.latitude && loc.longitude) {
-                // Create a marker
-                const marker = L.marker([loc.latitude, loc.longitude], {
-                  icon: L.divIcon({
-                    className: "custom-marker",
-                    html: "📍",
-                    iconSize: [30, 30],
-                  }),
-                }).addTo(map);
-
-                // Add popup for when you click the marker
-                marker.bindPopup(`
-                                <div class="popup-title">${loc.name}</div>
-                                <div class="popup-row"><strong>Type:</strong> ${
-                                  loc.business_type || "N/A"
-                                }</div>
-                                <div class="popup-row"><strong>Address:</strong> ${
-                                  loc.address
-                                }</div>
-                                <div class="popup-row"><strong>City:</strong> ${
-                                  loc.city
-                                }, ${loc.state}</div>
-                                <div class="popup-row"><strong>ZIP:</strong> ${
-                                  loc.zip_code
-                                }</div>
-                            `);
-
-                locationMarkers.push({ marker, data: loc });
-              }
-            });
-          }
-        } catch (error) {
-          console.error("Error loading map data:", error);
-          alert("Error loading map data. Please refresh the page.");
-        }
-      }
-
-      // Function to determine color based on income
       function getIncomeColor(income) {
-        if (!income) return "#9e9e9e"; // Gray for unknown
-        if (income < 40000) return "#ef5350"; // Red for low
-        if (income < 75000) return "#ffa726"; // Orange for middle
-        if (income < 120000) return "#66bb6a"; // Green for upper middle
-        return "#42a5f5"; // Blue for high
+        if (!income) return "#9e9e9e";
+        if (income < 40000) return "#dc3545";
+        if (income < 75000) return "#ffc107";
+        if (income < 120000) return "#28a745";
+        return "#007bff";
       }
 
-      // Comprehensive ZIP code coordinate lookup
-      function getZipCoordinates(zipCode, city) {
-        // Coordinates for your target regions
-        const zipCoords = {
-          // Atlantic Iowa Region
-          50022: [41.5914, -94.7633], // Anita, IA
-          50025: [41.4036, -95.0139], // Atlantic, IA
-          51520: [41.2619, -95.8608], // Council Bluffs, IA
-          51601: [40.7658, -95.3769], // Shenandoah, IA
+      async function loadMapData() {
+        const response = await fetch("/api/demographics");
+        const data = await response.json();
 
-          // St. Joseph Missouri Region
-          64501: [39.7684, -94.8467], // Saint Joseph, MO
-          64503: [39.7447, -94.8163], // Saint Joseph, MO (North)
+        if (data.demographics) {
+          data.demographics.forEach((demo) => {
+            const coords = zipCoords[demo.zip_code];
+            if (coords) {
+              const color = getIncomeColor(demo.median_income);
+              const radius = Math.sqrt(demo.population || 1000) * 30;
 
-          // Leavenworth Kansas Region
-          66027: [39.3111, -94.9225], // Leavenworth, KS
-          66048: [39.3697, -94.9858], // Leavenworth, KS (North)
-          66002: [39.5631, -95.1218], // Atchison, KS
+              const circle = L.circle(coords, {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.5,
+                radius: radius,
+                weight: 2,
+              }).addTo(map);
 
-          // Kansas City Metro
-          64101: [39.0997, -94.5786], // Kansas City, MO (Downtown)
-          64112: [39.0399, -94.5919], // Kansas City, MO (Plaza)
-          64030: [38.8861, -94.5333], // Grandview, MO
-          66207: [38.9822, -94.6708], // Overland Park, KS
-        };
+              const currentFilters = JSON.stringify(activeFilters);
 
-        // Return coordinates if found, otherwise default to Kansas City
-        return zipCoords[zipCode] || [39.0997, -94.5786];
+              circle.bindPopup(`
+                            <div style="padding: 10px;">
+                                <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">
+                                    ${demo.city}, ${demo.state} ${demo.zip_code}
+                                </div>
+                                <div style="margin: 4px 0;">Population: ${demo.population?.toLocaleString()}</div>
+                                <div style="margin: 4px 0;">Median Income: $${demo.median_income?.toLocaleString()}</div>
+                                <div style="margin: 4px 0;">Home Value: $${demo.median_home_value?.toLocaleString()}</div>
+                                <button class="save-address-btn" onclick='saveAddress(${JSON.stringify(
+                                  demo
+                                )}, ${currentFilters})'>
+                                    💾 Save This Area
+                                </button>
+                            </div>
+                        `);
+
+              demographicCircles.push({ circle, data: demo });
+            }
+          });
+        }
+
+        loadAdminStats();
       }
 
-      // FILTER FUNCTIONALITY
-      // When user changes filters, update what's visible on the map
+      // Filter buttons
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          this.classList.toggle("active");
+          applyFilters();
+          saveSearchHistory();
+        });
+      });
 
-      document
-        .getElementById("income-filter")
-        .addEventListener("change", applyFilters);
-      document
-        .getElementById("business-filter")
-        .addEventListener("change", applyFilters);
-      document
-        .getElementById("metric-filter")
-        .addEventListener("change", applyFilters);
+      // Search
       document
         .getElementById("zip-search")
-        .addEventListener("input", applyFilters);
+        .addEventListener("input", function () {
+          activeFilters.search = this.value.toLowerCase();
+          applyFilters();
+        });
 
       function applyFilters() {
-        const incomeFilter = document.getElementById("income-filter").value;
-        const businessFilter = document.getElementById("business-filter").value;
-        const zipSearch = document
-          .getElementById("zip-search")
-          .value.toLowerCase();
+        const incomeFilters = Array.from(
+          document.querySelectorAll('[data-filter="income"].active')
+        ).map((b) => b.dataset.value);
+        const popFilters = Array.from(
+          document.querySelectorAll('[data-filter="population"].active')
+        ).map((b) => b.dataset.value);
+        const homeFilters = Array.from(
+          document.querySelectorAll('[data-filter="home-value"].active')
+        ).map((b) => b.dataset.value);
 
-        let visibleCount = 0;
-
-        // Filter demographic circles
         demographicCircles.forEach(({ circle, data }) => {
           let show = true;
 
-          // Check income filter
-          if (incomeFilter !== "all") {
+          if (incomeFilters.length > 0) {
             const income = data.median_income || 0;
-            if (incomeFilter === "low" && income >= 40000) show = false;
-            if (
-              incomeFilter === "middle" &&
-              (income < 40000 || income >= 75000)
-            )
-              show = false;
-            if (
-              incomeFilter === "upper" &&
-              (income < 75000 || income >= 120000)
-            )
-              show = false;
-            if (incomeFilter === "high" && income < 120000) show = false;
+            const matches = incomeFilters.some((f) => {
+              if (f === "low") return income < 40000;
+              if (f === "middle") return income >= 40000 && income < 75000;
+              if (f === "upper") return income >= 75000 && income < 120000;
+              if (f === "high") return income >= 120000;
+              return false;
+            });
+            if (!matches) show = false;
           }
 
-          // Check ZIP search
-          if (zipSearch && !data.zip_code.toLowerCase().includes(zipSearch)) {
-            show = false;
+          if (popFilters.length > 0) {
+            const pop = data.population || 0;
+            const matches = popFilters.some((f) => {
+              if (f === "small") return pop < 1000;
+              if (f === "medium") return pop >= 1000 && pop < 10000;
+              if (f === "large") return pop >= 10000;
+              return false;
+            });
+            if (!matches) show = false;
           }
 
-          // Show or hide the circle
+          if (homeFilters.length > 0) {
+            const value = data.median_home_value || 0;
+            const matches = homeFilters.some((f) => {
+              if (f === "low") return value < 100000;
+              if (f === "mid") return value >= 100000 && value < 200000;
+              if (f === "high") return value >= 200000;
+              return false;
+            });
+            if (!matches) show = false;
+          }
+
+          if (activeFilters.search) {
+            const matchesZip = data.zip_code
+              .toLowerCase()
+              .includes(activeFilters.search);
+            const matchesCity = data.city
+              .toLowerCase()
+              .includes(activeFilters.search);
+            if (!matchesZip && !matchesCity) show = false;
+          }
+
           if (show) {
             circle.addTo(map);
-            visibleCount++;
           } else {
             map.removeLayer(circle);
           }
         });
-
-        // Filter location markers
-        locationMarkers.forEach(({ marker, data }) => {
-          let show = true;
-
-          // Check business type filter
-          if (businessFilter !== "all") {
-            const type = (data.business_type || "").toLowerCase();
-            if (!type.includes(businessFilter.toLowerCase())) show = false;
-          }
-
-          // Check ZIP search
-          if (zipSearch && !data.zip_code.toLowerCase().includes(zipSearch)) {
-            show = false;
-          }
-
-          // Show or hide the marker
-          if (show) {
-            marker.addTo(map);
-            visibleCount++;
-          } else {
-            map.removeLayer(marker);
-          }
-        });
-
-        // Update visible count
-        document.getElementById("visible-count").textContent = visibleCount;
       }
 
-      // Load the data when page loads
+      function refreshFilters() {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.getElementById("zip-search").value = "";
+        activeFilters = {
+          income: [],
+          population: [],
+          homeValue: [],
+          search: "",
+        };
+        applyFilters();
+      }
+
+      function setFeatured(type) {
+        refreshFilters();
+        if (type === "high-income") {
+          document
+            .querySelector('[data-filter="income"][data-value="high"]')
+            .classList.add("active");
+        } else if (type === "suburban") {
+          document
+            .querySelector('[data-filter="population"][data-value="medium"]')
+            .classList.add("active");
+        }
+        applyFilters();
+      }
+
+      function toggleAdminMenu() {
+        document.getElementById("adminSidebar").classList.toggle("open");
+      }
+
+      function toggleUserMenu() {
+        document.getElementById("userMenu").classList.toggle("open");
+      }
+
+      async function loadAdminStats() {
+        try {
+          const stats = await fetch("/api/admin/stats").then((r) => r.json());
+          if (document.getElementById("admin-users")) {
+            document.getElementById("admin-users").textContent =
+              stats.users || 0;
+            document.getElementById("admin-locations").textContent =
+              stats.locations || 0;
+            document.getElementById("admin-demographics").textContent =
+              stats.demographics || 0;
+            document.getElementById("admin-saved").textContent =
+              stats.saved_addresses || 0;
+          }
+        } catch (e) {}
+      }
+
+      async function saveAddress(demo, filters) {
+        const name = prompt(
+          `Name this location (e.g., "Johnson Neighborhood"):`
+        );
+        if (!name) return;
+
+        await fetch("/api/saved-addresses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name,
+            address: `${demo.city}, ${demo.state}`,
+            city: demo.city,
+            state: demo.state,
+            zip_code: demo.zip_code,
+            address_type: "residential",
+            filters_used: JSON.parse(filters),
+          }),
+        });
+
+        alert("✅ Address saved!");
+      }
+
+      async function saveSearchHistory() {
+        const incomeFilters = Array.from(
+          document.querySelectorAll('[data-filter="income"].active')
+        ).map((b) => b.dataset.value);
+        const popFilters = Array.from(
+          document.querySelectorAll('[data-filter="population"].active')
+        ).map((b) => b.dataset.value);
+
+        await fetch("/api/search-history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filters: { income: incomeFilters, population: popFilters },
+          }),
+        });
+      }
+
       loadMapData();
+
+      // Close menus on click outside
+      document.addEventListener("click", function (e) {
+        if (
+          !e.target.closest(".user-menu") &&
+          !e.target.closest(".user-menu-btn")
+        ) {
+          document.getElementById("userMenu").classList.remove("open");
+        }
+        if (
+          !e.target.closest(".admin-sidebar") &&
+          !e.target.closest(".admin-menu-btn")
+        ) {
+          if (document.getElementById("adminSidebar")) {
+            document.getElementById("adminSidebar").classList.remove("open");
+          }
+        }
+      });
     </script>
   </body>
 </html>

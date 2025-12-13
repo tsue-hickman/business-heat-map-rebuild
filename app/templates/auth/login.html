@@ -12,354 +12,176 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        background: linear-gradient(
-          135deg,
-          rgba(240, 242, 255, 0.95) 0%,
-          rgba(220, 230, 255, 0.95) 50%,
-          rgba(200, 210, 255, 0.95) 100%
-        );
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* Subtle animated background dots */
-      body::before {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(
-            circle at 20% 50%,
-            rgba(102, 126, 234, 0.1) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 80%,
-            rgba(118, 75, 162, 0.1) 0%,
-            transparent 50%
-          );
-        animation: float 15s ease-in-out infinite;
-      }
-
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-20px);
-        }
-      }
-
-      .login-wrapper {
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        max-width: 440px;
       }
 
       .login-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.1);
-        padding: 48px 40px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: white;
+        padding: 50px 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 400px;
       }
 
-      .logo-section {
+      .logo {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
       }
 
-      .logo-icon {
-        width: 64px;
-        height: 64px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.25);
+      .logo h1 {
+        font-size: 2em;
+        color: #333;
+        margin-bottom: 10px;
       }
 
-      .logo-section h1 {
-        font-size: 28px;
-        color: #1a1a2e;
-        margin-bottom: 8px;
-        font-weight: 600;
-        letter-spacing: -0.5px;
+      .logo p {
+        color: #666;
+        font-size: 0.95em;
       }
 
-      .logo-section p {
-        color: #6b7280;
-        font-size: 15px;
-        font-weight: 400;
-      }
-
-      /* Flash Messages */
-      .alert {
-        padding: 14px 16px;
-        border-radius: 12px;
-        margin-bottom: 24px;
-        font-size: 14px;
-        font-weight: 500;
-        border: 1px solid;
-      }
-
-      .alert-danger {
-        background: rgba(254, 226, 226, 0.9);
-        border-color: rgba(248, 113, 113, 0.3);
-        color: #dc2626;
-      }
-
-      .alert-success {
-        background: rgba(220, 252, 231, 0.9);
-        border-color: rgba(74, 222, 128, 0.3);
-        color: #16a34a;
-      }
-
-      .alert-info {
-        background: rgba(224, 242, 254, 0.9);
-        border-color: rgba(96, 165, 250, 0.3);
-        color: #2563eb;
-      }
-
-      /* Form Styling */
       .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
       }
 
       .form-group label {
         display: block;
         margin-bottom: 8px;
-        color: #374151;
-        font-weight: 500;
-        font-size: 14px;
-        letter-spacing: 0.2px;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95em;
       }
 
       .form-group input {
         width: 100%;
-        padding: 14px 16px;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 12px;
-        font-size: 15px;
-        transition: all 0.2s ease;
-        font-family: inherit;
-        background: white;
-        color: #1a1a2e;
-      }
-
-      .form-group input::placeholder {
-        color: #9ca3af;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: all 0.3s;
       }
 
       .form-group input:focus {
         outline: none;
         border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       }
 
-      /* Checkbox */
-      .checkbox-group {
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-      }
-
-      .checkbox-group input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
-        cursor: pointer;
-        border-radius: 4px;
-        border: 1.5px solid #d1d5db;
-      }
-
-      .checkbox-group label {
-        font-size: 14px;
-        color: #6b7280;
-        cursor: pointer;
-        user-select: none;
-      }
-
-      /* Button */
       .btn-login {
         width: 100%;
         padding: 15px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 12px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 1.1em;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
-        letter-spacing: 0.3px;
+        transition: transform 0.2s;
       }
 
       .btn-login:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
       }
 
-      .btn-login:active {
-        transform: translateY(0);
-      }
-
-      /* Links */
-      .form-footer {
-        margin-top: 32px;
-        padding-top: 28px;
-        border-top: 1px solid #e5e7eb;
+      .register-link {
         text-align: center;
+        margin-top: 20px;
+        color: #666;
       }
 
-      .form-footer p {
-        color: #6b7280;
-        font-size: 14px;
-        margin-bottom: 12px;
-      }
-
-      .form-footer a {
+      .register-link a {
         color: #667eea;
         text-decoration: none;
         font-weight: 600;
-        transition: color 0.2s;
       }
 
-      .form-footer a:hover {
-        color: #764ba2;
+      .register-link a:hover {
+        text-decoration: underline;
       }
 
-      /* Demo Credentials */
-      .demo-box {
-        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 24px;
-        font-size: 13px;
-        border: 1px solid #e5e7eb;
+      .flash-messages {
+        margin-bottom: 20px;
       }
 
-      .demo-box h4 {
-        color: #374151;
-        margin-bottom: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      .flash-message {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
       }
 
-      .demo-box p {
-        color: #6b7280;
-        margin: 8px 0;
-        line-height: 1.6;
+      .flash-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
       }
 
-      .demo-box code {
-        background: white;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-family: "Courier New", monospace;
-        color: #667eea;
-        font-size: 12px;
-        border: 1px solid #e5e7eb;
+      .flash-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
       }
 
-      /* Responsive */
-      @media (max-width: 480px) {
-        .login-container {
-          padding: 36px 28px;
-        }
+      .demo-info {
+        background: #e7f3ff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 0.85em;
+        color: #0066cc;
+      }
 
-        .logo-section h1 {
-          font-size: 24px;
-        }
+      .demo-info strong {
+        display: block;
+        margin-bottom: 5px;
       }
     </style>
   </head>
   <body>
-    <div class="login-wrapper">
-      <div class="login-container">
-        <!-- Logo Section -->
-        <div class="logo-section">
-          <div class="logo-icon">🗺️</div>
-          <h1>Welcome Back</h1>
-          <p>Sign in to access your heat map</p>
+    <div class="login-container">
+      <div class="logo">
+        <h1>🗺️ Business Heat Map</h1>
+        <p>Window Treatment Lead Finder</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required autofocus />
         </div>
 
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %} {% endif %} {% endwith %}
-
-        <!-- Login Form -->
-        <form method="POST" action="{{ url_for('auth.login') }}">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              placeholder="Enter your username"
-              required
-              autofocus
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <div class="checkbox-group">
-            <input type="checkbox" id="remember" name="remember" value="true" />
-            <label for="remember">Remember me for 30 days</label>
-          </div>
-
-          <button type="submit" class="btn-login">Sign In</button>
-        </form>
-
-        <!-- Footer Links -->
-        <div class="form-footer">
-          <p>
-            Don't have an account?
-            <a href="{{ url_for('auth.register') }}">Create one</a>
-          </p>
-          <p><a href="{{ url_for('main.home') }}">← Back to Home</a></p>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
         </div>
 
-        <!-- Demo Credentials -->
-        <div class="demo-box">
-          <h4>🔑 Demo Accounts</h4>
-          <p>
-            <strong>Admin:</strong> <code>admin</code> / <code>admin123</code>
-          </p>
-          <p>
-            <strong>User:</strong> <code>demo_user</code> / <code>demo123</code>
-          </p>
-        </div>
+        <button type="submit" class="btn-login">Login</button>
+      </form>
+
+      <div class="register-link">
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}">Register here</a>
+      </div>
+
+      <div class="demo-info">
+        <strong>Demo Credentials:</strong>
+        Username: <strong>admin</strong><br />
+        Password: <strong>admin123</strong>
       </div>
     </div>
   </body>
