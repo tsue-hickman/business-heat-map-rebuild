@@ -404,7 +404,7 @@
           <i class="fas fa-bars"></i>
         </button>
         {% endif %}
-        <div class="logo">🗺️ Lead Finder</div>
+        <div class="logo">Lead Finder</div>
       </div>
       <button class="user-menu-btn" onclick="toggleUserMenu()">
         <i class="fas fa-user-circle"></i>
@@ -428,13 +428,13 @@
 
           <div class="featured-options">
             <button class="featured-btn" onclick="setFeatured('high-income')">
-              💰 High Income Areas
+              High Income Areas
             </button>
             <button class="featured-btn" onclick="setFeatured('suburban')">
-              🏡 Suburban Neighborhoods
+              Suburban Neighborhoods
             </button>
             <button class="featured-btn" onclick="setFeatured('new-builds')">
-              🏗️ New Construction Zones
+              New Construction Zones
             </button>
           </div>
         </div>
@@ -624,7 +624,7 @@
       const map = L.map("map").setView([40.5, -95.0], 7);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
+        attribution: "Â© OpenStreetMap contributors",
         maxZoom: 18,
       }).addTo(map);
 
@@ -696,8 +696,8 @@
               const circle = L.circle(coords, {
                 color: color,
                 fillColor: color,
-                fillOpacity: 0.5,
-                radius: radius,
+                fillOpacity: 0.6,
+                radius: 1200,
                 weight: 2,
               }).addTo(map);
 
@@ -714,7 +714,7 @@
                                 <button class="save-address-btn" onclick='saveAddress(${JSON.stringify(
                                   demo
                                 )}, ${currentFilters})'>
-                                    💾 Save This Area
+                                    ðŸ’¾ Save This Area
                                 </button>
                             </div>
                         `);
@@ -882,7 +882,7 @@
           }),
         });
 
-        alert("✅ Address saved!");
+        alert("âœ… Address saved!");
       }
 
       async function saveSearchHistory() {

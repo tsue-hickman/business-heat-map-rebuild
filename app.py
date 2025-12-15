@@ -1,45 +1,39 @@
-from flask import Flask
-from flask_login import LoginManager
-from app.extensions import db
 import os
-
-# Initialize login manager
-login_manager = LoginManager()
+from flask import Flask
+from app.extensions import db, login_manager
 
 def create_app(config_name='development'):
-    app = Flask(__name__, 
-                template_folder='app/templates',
-                static_folder='app/static')
+    """Create Flask application"""
+    app = Flask(__name__)
     
-    from config import config
-    app.config.from_object(config[config_name])
+    # Configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-please-change')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///business_heatmap.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
+    # Initialize extensions with app
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'info'
-    
-    # User loader for Flask-Login
-    from app.models import User
-    
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-    
-    # Import models and create tables
-    with app.app_context():
-        from app.models import User, Location, Demographic
-        db.create_all()
     
     # Import and register blueprints
-    from app.routes import main, auth, admin
-    app.register_blueprint(main.bp)
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(admin.bp)
+    from app.routes.main import main
+    from app.routes.auth import auth
+    from app.routes.admin import admin
+    
+    app.register_blueprint(main)
+    app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(admin, url_prefix='/admin')
+    
+    # Create tables in app context
+    with app.app_context():
+        # Import all models to ensure they're registered
+        from app.models import User, Location, Demographic, SearchHistory, SavedAddress
+        db.create_all()
     
     return app
 
+
 if __name__ == '__main__':
-    app = create_app(os.getenv('FLASK_ENV', 'development'))
+    app = create_app('development')
     app.run(host='0.0.0.0', port=5000, debug=True)

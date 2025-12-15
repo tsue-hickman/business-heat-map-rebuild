@@ -3,41 +3,41 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.extensions import db
 from app.models import User
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+# Changed from 'bp' to 'auth' and removed url_prefix (it's in app/__init__.py)
+auth = Blueprint('auth', __name__)
 
-@bp.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
-    # If user is already logged in, redirect to home
+    # If user is already logged in, redirect to map
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.map_view'))
     
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        remember = request.form.get('remember', False)
         
         if not username or not password:
-            flash('Please enter both username and password.', 'danger')
-            return render_template('auth/login.html')
+            flash('Please enter both username and password.', 'error')
+            return render_template('test.html')
         
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
-            login_user(user, remember=remember)
+            login_user(user)
             flash(f'Welcome back, {user.username}!', 'success')
             
-            # Redirect to next page or home
+            # Redirect to next page or map
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
+            return redirect(next_page) if next_page else redirect(url_for('main.map_view'))
         else:
-            flash('Invalid username or password.', 'danger')
+            flash('Invalid username or password.', 'error')
     
     return render_template('auth/login.html')
 
-@bp.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.map_view'))
     
     if request.method == 'POST':
         username = request.form.get('username')
@@ -46,29 +46,29 @@ def register():
         confirm_password = request.form.get('confirm_password')
         
         # Validation
-        if not all([username, email, password, confirm_password]):
-            flash('All fields are required.', 'danger')
+        if not all([username, password, confirm_password]):
+            flash('Username and password are required.', 'error')
             return render_template('auth/register.html')
         
         if password != confirm_password:
-            flash('Passwords do not match.', 'danger')
+            flash('Passwords do not match.', 'error')
             return render_template('auth/register.html')
         
         if len(password) < 6:
-            flash('Password must be at least 6 characters long.', 'danger')
+            flash('Password must be at least 6 characters long.', 'error')
             return render_template('auth/register.html')
         
-        # Check if username or email already exists
+        # Check if username already exists
         if User.query.filter_by(username=username).first():
-            flash('Username already exists.', 'danger')
+            flash('Username already exists.', 'error')
             return render_template('auth/register.html')
         
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered.', 'danger')
+        if email and User.query.filter_by(email=email).first():
+            flash('Email already registered.', 'error')
             return render_template('auth/register.html')
         
         # Create new user
-        new_user = User(username=username, email=email, role='user')
+        new_user = User(username=username, email=email, is_admin=False)
         new_user.set_password(password)
         
         db.session.add(new_user)
@@ -79,9 +79,9 @@ def register():
     
     return render_template('auth/register.html')
 
-@bp.route('/logout')
+@auth.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('main.home'))
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('auth.login'))

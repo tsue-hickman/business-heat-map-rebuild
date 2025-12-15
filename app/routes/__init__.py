@@ -1,1 +1,1 @@
-# Routes package initialization
+# This file makes 'routes' a Python package

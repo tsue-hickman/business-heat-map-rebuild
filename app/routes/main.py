@@ -1,4 +1,3 @@
-# app/routes/main.py
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.extensions import db

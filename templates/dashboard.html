@@ -58,13 +58,13 @@
       <!-- Quick Actions -->
       <div class="dashboard-actions" style="margin-bottom: 30px">
         <a href="{{ url_for('main.add_location') }}" class="btn btn-primary">
-          ➕ Add New Location
+          âž• Add New Location
         </a>
         <a href="{{ url_for('main.map_view') }}" class="btn">
-          🗺️ View Heat Map
+          ðŸ—ºï¸ View Heat Map
         </a>
         {% if current_user.is_admin() %}
-        <a href="{{ url_for('admin.panel') }}" class="btn"> ⚙️ Admin Panel </a>
+        <a href="{{ url_for('admin.panel') }}" class="btn"> âš™ï¸ Admin Panel </a>
         {% endif %}
       </div>
 
@@ -101,7 +101,7 @@
             href="{{ url_for('main.map_view') }}"
             style="color: #667eea; text-decoration: none"
           >
-            → View these locations on the heat map
+            â†’ View these locations on the heat map
           </a>
         </p>
         {% else %}
@@ -120,7 +120,7 @@
         class="info-box"
         style="background: #e7f3ff; border-left: 4px solid #2196f3"
       >
-        <h3 style="margin-top: 0">💡 Getting Started</h3>
+        <h3 style="margin-top: 0">ðŸ’¡ Getting Started</h3>
         <ul style="margin-left: 20px">
           <li>Add business locations you're considering</li>
           <li>View demographic data for each area on the heat map</li>
